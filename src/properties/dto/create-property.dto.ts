@@ -1,4 +1,5 @@
-import { IsEnum, IsObject, IsString, Matches, MinLength } from "@nestjs/class-validator";
+import { IsEnum, IsObject, IsOptional, IsString, Matches, MinLength } from "@nestjs/class-validator";
+import { DataType } from "generated/prisma";
 
 export enum FieldType {
     STRING = 'string',
@@ -14,14 +15,15 @@ export class CreatePropertyDto {
     })
     name: string;
     
-    @IsEnum(FieldType, {
+    @IsEnum(DataType, {
         message: 'Type must be one of: string, number, boolean',
     })
-    type: string;
+    type: DataType;
     
     @IsString()
     description: string;
 
     @IsObject()
+    @IsOptional()
     valdiationRules: Record<string, any>;
 }

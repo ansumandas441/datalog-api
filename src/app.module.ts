@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { PrismaService } from 'prisma/prisma.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EventsModule } from './events/events.module';
@@ -15,6 +16,6 @@ import { TrackingPlansModule } from './tracking-plans/tracking-plans.module';
     PropertiesModule, 
     TrackingPlansModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}

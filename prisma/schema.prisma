@@ -26,8 +26,7 @@ model Property {
   
   eventProperties EventProperty[]
   
-  @@unique([organizationId, name])
-  @@index([organizationId, name, type])  // Index for lookups by org, name, and type
+  @@unique([organizationId, name, type])  // Unique key
   @@index([organizationId])  // Index for RLS performance
   @@map("properties")
 }
@@ -44,7 +43,6 @@ model Event {
   eventProperties EventProperty[]
   trackingPlanEvents TrackingPlanEvent[]
   
-  @@unique([organizationId, name])
   @@unique([organizationId, name, type]) // Index for lookups by org and name
   @@index([organizationId])         // Index for RLS performance
   @@map("events")
@@ -62,7 +60,7 @@ model TrackingPlan {
   trackingPlanEvents TrackingPlanEvent[]
   
   // @@unique([organizationId, name, version])
-  @@index([organizationId, name])           // Index for lookups by org and name
+  @@unique([organizationId, name])           // Index for lookups by org and name
   @@index([organizationId])                 // Index for RLS performance
   @@map("tracking_plans")
 }
@@ -100,7 +98,7 @@ model TrackingPlanEvent {
 }
 
 enum DataType {
-  STRING
-  NUMBER
-  BOOLEAN
+  string
+  number
+  boolean
 }

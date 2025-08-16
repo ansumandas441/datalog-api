@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "public"."DataType" AS ENUM ('STRING', 'NUMBER', 'BOOLEAN');
+CREATE TYPE "public"."DataType" AS ENUM ('string', 'number', 'boolean');
 
 -- CreateTable
 CREATE TABLE "public"."properties" (
@@ -63,28 +63,22 @@ CREATE TABLE "public"."tracking_plan_events" (
 );
 
 -- CreateIndex
-CREATE INDEX "properties_organizationId_name_type_idx" ON "public"."properties"("organizationId", "name", "type");
-
--- CreateIndex
 CREATE INDEX "properties_organizationId_idx" ON "public"."properties"("organizationId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "properties_organizationId_name_key" ON "public"."properties"("organizationId", "name");
+CREATE UNIQUE INDEX "properties_organizationId_name_type_key" ON "public"."properties"("organizationId", "name", "type");
 
 -- CreateIndex
 CREATE INDEX "events_organizationId_idx" ON "public"."events"("organizationId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "events_organizationId_name_key" ON "public"."events"("organizationId", "name");
-
--- CreateIndex
 CREATE UNIQUE INDEX "events_organizationId_name_type_key" ON "public"."events"("organizationId", "name", "type");
 
 -- CreateIndex
-CREATE INDEX "tracking_plans_organizationId_name_idx" ON "public"."tracking_plans"("organizationId", "name");
+CREATE INDEX "tracking_plans_organizationId_idx" ON "public"."tracking_plans"("organizationId");
 
 -- CreateIndex
-CREATE INDEX "tracking_plans_organizationId_idx" ON "public"."tracking_plans"("organizationId");
+CREATE UNIQUE INDEX "tracking_plans_organizationId_name_key" ON "public"."tracking_plans"("organizationId", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "event_properties_eventId_propertyId_key" ON "public"."event_properties"("eventId", "propertyId");
@@ -103,6 +97,7 @@ ALTER TABLE "public"."tracking_plan_events" ADD CONSTRAINT "tracking_plan_events
 
 -- AddForeignKey
 ALTER TABLE "public"."tracking_plan_events" ADD CONSTRAINT "tracking_plan_events_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "public"."events"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 -- ============================================================================
 -- RLS POLICIES

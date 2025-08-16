@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  id             String       @id @default(cuid())
+  name           String
+  description    String
+  type           DataType
+  valdiationRules Json?        // Store validation rules as JSON
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  eventProperties EventProperty[]
+  
+  @@unique([organizationId, name])
+  @@index([organizationId, name, type])  // Index for lookups by org, name, and type
+  @@index([organizationId])  // Index for RLS performance
+  @@map("properties")
+}
+
+model Event {
+  id             String       @id @default(cuid())
+  name           String
+  type           String
+  description    String
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  eventProperties EventProperty[]
+  trackingPlanEvents TrackingPlanEvent[]
+  
+  @@unique([organizationId, name])
+  @@unique([organizationId, name, type]) // Index for lookups by org and name
+  @@index([organizationId])         // Index for RLS performance
+  @@map("events")
+}
+
+model TrackingPlan {
+  id             String       @id @default(cuid())
+  name           String
+  description    String?
+  // version        String       @default("1.0.0")
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  trackingPlanEvents TrackingPlanEvent[]
+  
+  // @@unique([organizationId, name, version])
+  @@index([organizationId, name])           // Index for lookups by org and name
+  @@index([organizationId])                 // Index for RLS performance
+  @@map("tracking_plans")
+}
+
+//Have to make sure after clarification, if each event have canonical properties or only during tracking TrackingPlan
+//DEfinition type it is added, in that case have to add the trackingPlanId needs to be added with an index
+
+model EventProperty {
+  id         String   @id @default(cuid())
+  eventId    String
+  propertyId String
+  isRequired Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  @@unique([eventId, propertyId])
+  @@map("event_properties")
+}
+
+model TrackingPlanEvent {
+  id             String       @id @default(cuid())
+  trackingPlanId String
+  eventId        String
+  additionalProperties Boolean @default(false)
+  createdAt      DateTime     @default(now())
+  
+  // Relations
+  trackingPlan   TrackingPlan @relation(fields: [trackingPlanId], references: [id], onDelete: Cascade)
+  event          Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  @@unique([trackingPlanId, eventId])
+  @@map("tracking_plan_events")
+}
+
+enum DataType {
+  STRING
+  NUMBER
+  BOOLEAN
+}

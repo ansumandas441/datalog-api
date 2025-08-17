@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePropertyDto } from './dto/create-property.dto';
+import { PropertyPaginationDto } from './dto/pagination-dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
+import { PropertiesRepository } from './properties.repository';
 
 @Injectable()
 export class PropertiesService {
-  create(createPropertyDto: CreatePropertyDto) {
-    return 'This action adds a new property';
+  constructor(private readonly repo: PropertiesRepository){ }
+
+  create(organizationId: string, createPropertyDto: CreatePropertyDto) {
+    return this.repo.create(organizationId, createPropertyDto)
   }
 
-  findAll() {
-    return `This action returns all properties`;
+  findAll(organizationId: string, propertyPaginationDto: PropertyPaginationDto) {
+    return this.repo.findAll(organizationId, propertyPaginationDto)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} property`;
+  findById(organizationId: string, id: string) {
+    return this.repo.findById(organizationId, id);
   }
 
-  update(id: number, updatePropertyDto: UpdatePropertyDto) {
-    return `This action updates a #${id} property`;
+  findByNameAndType(organizationId: string, name: string, type) {
+    return this.repo.findByNameAndType(organizationId, name, type);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} property`;
+  update(organizationId: string, propertyId: string, updatePropertyDto: UpdatePropertyDto) {
+    return this.repo.update(organizationId, propertyId, updatePropertyDto);
+  }
+
+  remove(organizationId: string, propertyId: string) {
+    return this.repo.remove(organizationId, propertyId);
   }
 }

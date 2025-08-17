@@ -142,10 +142,28 @@ CREATE POLICY "tracking_plan_events_org_isolation" ON "public"."tracking_plan_ev
         )
     );
 
--- Helper function to set organization context
+
+-- First, check if the function exists
+SELECT proname FROM pg_proc WHERE proname = 'set_current_org_id';
+
+-- Drop the function if it exists (to recreate it)
+DROP FUNCTION IF EXISTS set_current_org_id(text);
+
+-- Create the function with proper permissions
 CREATE OR REPLACE FUNCTION set_current_org_id(org_id text)
 RETURNS void AS $$
 BEGIN
-    PERFORM set_config('app.current_org_id', org_id, true);
+    -- Validate input
+    IF org_id IS NULL OR org_id = '' THEN
+        PERFORM set_config('app.current_org_id', '', false);
+    ELSE
+        PERFORM set_config('app.current_org_id', org_id, false);
+    END IF;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execute permissions to the database user
+GRANT EXECUTE ON FUNCTION set_current_org_id(text) TO PUBLIC;
+
+-- Verify the function was created
+SELECT proname, prosrc FROM pg_proc WHERE proname = 'set_current_org_id';
